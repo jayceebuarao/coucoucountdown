@@ -1,16 +1,27 @@
+import 'package:coucoucountdown/providers/events_provider.dart';
 import 'package:coucoucountdown/screens/createeventpage.dart';
 import 'package:flutter/material.dart';
 
-class EventsPage extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class EventsPage extends ConsumerStatefulWidget {
   const EventsPage({super.key});
 
   @override
-  State<EventsPage> createState() => _EventsPageState();
+  ConsumerState<EventsPage> createState() => _EventsPageState();
 }
 
-class _EventsPageState extends State<EventsPage> {
+class _EventsPageState extends ConsumerState<EventsPage> {
+  late Future<void> _eventsFuture;
+  @override
+  void initState() {
+    super.initState();
+    _eventsFuture = ref.read(userEventsProvider.notifier).loadEvents();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // final userEvents = ref.watch(userEventsProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Events'),
