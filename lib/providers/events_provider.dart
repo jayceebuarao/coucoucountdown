@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
+import 'packag';
 
 Future<Database> _getDatabase() async {
   final dbPath = await sql.getDatabasesPath();
@@ -14,4 +15,14 @@ Future<Database> _getDatabase() async {
   );
 
   return db;
+}
+
+
+class UserEventsNotifier extends StateNotifier<> {
+  UserEventsNotifier(): super();
+  
+  Future<void> loadEvents() async{
+    final db = await _getDatabase();
+    final data = await db.query('user_events')
+  }
 }
