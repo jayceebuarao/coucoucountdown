@@ -9,7 +9,7 @@ class Event {
   Event({
     String? id,
     required this.title,
-    required this.date,
+    required this.eventDate,
     required this.isAllDay,
     required this.hmsTime,
     this.timeUnit = CounterUnits.summary,
@@ -22,7 +22,7 @@ class Event {
 
   final String id;
   final String title;
-  final DateTime date;
+  final DateTime eventDate;
   final bool isAllDay;
   final DateTime hmsTime;
   final CounterUnits timeUnit;
