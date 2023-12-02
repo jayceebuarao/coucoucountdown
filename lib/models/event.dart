@@ -10,8 +10,6 @@ class Event {
     String? id,
     required this.title,
     required this.eventDate,
-    required this.isAllDay,
-    required this.hmsTime,
     required this.timeUnit,
     this.isCountdown = false,
     this.isDone = false,
@@ -23,8 +21,6 @@ class Event {
   final String id;
   final String title;
   final DateTime eventDate;
-  final bool isAllDay;
-  final DateTime hmsTime;
   final CounterUnits timeUnit;
   final bool isCountdown;
   final bool isDone;

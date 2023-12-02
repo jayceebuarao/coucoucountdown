@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:coucoucountdown/models/event.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart' as sql;
@@ -11,10 +9,10 @@ Future<Database> _getDatabase() async {
   final dbPath = await sql.getDatabasesPath();
   final db = await sql.openDatabase(
     path.join(dbPath, 'events.db'),
-    version: 1,
+    version: 3,
     onCreate: (db, version) {
       return db.execute(
-          'CREATE TABLE user_events(id TEXT PRIMARY KEY, title TEXT, eventDate BLOB, isAllDay INTEGER, hmsTime BLOB, timeUnit TEXT, isCountdown INTEGER, isDone INTEGER, color BLOB, icon BLOB)');
+          'CREATE TABLE user_events(id TEXT PRIMARY KEY, title TEXT, eventDate TEXT, timeUnit TEXT, isCountdown INTEGER, isDone INTEGER, color BLOB, icon BLOB)');
     },
   );
 
@@ -32,8 +30,6 @@ class UserEventsNotifier extends StateNotifier<List<Event>> {
           (row) => Event(
               title: row['title'] as String,
               eventDate: row['eventDate'] as DateTime,
-              isAllDay: row['isAllDay'] as bool,
-              hmsTime: row['hmsTime'] as DateTime,
               timeUnit: row['timeUnit'] as CounterUnits,
               isCountdown: row['isCountdown'] as bool,
               isDone: row['isDone'] as bool,
@@ -52,9 +48,7 @@ class UserEventsNotifier extends StateNotifier<List<Event>> {
       {
         'id': newEvent.id,
         'title': newEvent.title,
-        'eventDate': newEvent.eventDate,
-        'isAllDay': newEvent.isAllDay,
-        'hmsTime': newEvent.hmsTime,
+        'eventDate': newEvent.eventDate.toString(),
         'timeUnit': newEvent.timeUnit,
         'isCountdown': newEvent.isCountdown,
         'isDone': newEvent.isDone,
@@ -64,6 +58,7 @@ class UserEventsNotifier extends StateNotifier<List<Event>> {
     );
 
     state = [newEvent, ...state];
+    print(state.toList());
   }
 }
 

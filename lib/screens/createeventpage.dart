@@ -15,8 +15,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   final _formKey = GlobalKey<FormState>();
   var _enteredTitle = '';
   var _enteredEventDate = DateTime.now();
-  var _isAllDay = true;
-  late var _enteredEventTime = DateTime.parse('$_enteredEventDate');
   var _enteredTimeUnit = CounterUnits.summary;
   var _selectedIcon = const Icon(Icons.star);
   var _selectedColor = Colors.black;
@@ -26,9 +24,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
     if (_formKey.currentState!.validate()) {
       ref.read(userEventsProvider.notifier).addEvent(Event(
           title: _enteredTitle,
-          eventDate: _enteredEventTime,
-          isAllDay: _isAllDay,
-          hmsTime: _enteredEventTime,
+          eventDate: _enteredEventDate,
           timeUnit: _enteredTimeUnit,
           color: _selectedColor,
           icon: _selectedIcon));
@@ -82,53 +78,14 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         suffixIcon: Icon(Icons.event_note),
-                        labelText: 'Event Date'),
-                    mode: DateTimeFieldPickerMode.date,
+                        labelText: 'Event Date and Time'),
+                    mode: DateTimeFieldPickerMode.dateAndTime,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (e) =>
                         (e == null) ? 'Please enter a valid date' : null,
                     onDateSelected: (DateTime value) {
                       _enteredEventDate = value;
                     },
-                  ),
-                ),
-                //
-                // EVENT TIME
-                //
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: DateTimeFormField(
-                          enabled: _isAllDay ? false : true,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            suffixIcon: Icon(Icons.more_time),
-                            labelText: 'Event Time',
-                          ),
-                          mode: DateTimeFieldPickerMode.time,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (e) => (e == null && _isAllDay == false)
-                              ? 'Please enter a valid time'
-                              : null,
-                          onDateSelected: (DateTime value) {
-                            _enteredEventTime = value;
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      const Text('All Day'),
-                      Checkbox(
-                        value: _isAllDay,
-                        onChanged: (value) {
-                          setState(() {
-                            _isAllDay = value!;
-                          });
-                        },
-                      ),
-                    ],
                   ),
                 ),
                 //
