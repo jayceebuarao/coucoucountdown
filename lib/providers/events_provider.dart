@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:coucoucountdown/models/event.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart' as sql;
@@ -64,3 +66,7 @@ class UserEventsNotifier extends StateNotifier<List<Event>> {
     state = [newEvent, ...state];
   }
 }
+
+final userEventsProvider =
+    StateNotifierProvider<UserEventsNotifier, List<Event>>(
+        (ref) => UserEventsNotifier());
