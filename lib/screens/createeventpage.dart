@@ -1,24 +1,40 @@
-import 'package:coucoucountdown/models/counter_unit.dart';
+import 'package:coucoucountdown/models/event.dart';
+import 'package:coucoucountdown/providers/events_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:date_field/date_field.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CreateEventPage extends StatefulWidget {
+class CreateEventPage extends ConsumerStatefulWidget {
   const CreateEventPage({super.key});
 
   @override
-  State<CreateEventPage> createState() => _CreateEventPageState();
+  ConsumerState<CreateEventPage> createState() => _CreateEventPageState();
 }
 
-class _CreateEventPageState extends State<CreateEventPage> {
+class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   final _formKey = GlobalKey<FormState>();
   var _enteredTitle = '';
+  var _enteredEventDate = DateTime.now();
+  var _isAllDay = true;
+  late var _enteredEventTime = DateTime.parse('$_enteredEventDate');
+  var _enteredTimeUnit = CounterUnits.summary;
   var _selectedIcon = const Icon(Icons.star);
   var _selectedColor = Colors.black;
-  var isAllDay = true;
 
   void _saveEvent() {
     _formKey.currentState!.save();
-    print(_enteredTitle);
+    if (_formKey.currentState!.validate()) {
+      ref.read(userEventsProvider.notifier).addEvent(Event(
+          title: _enteredTitle,
+          eventDate: _enteredEventTime,
+          isAllDay: _isAllDay,
+          hmsTime: _enteredEventTime,
+          timeUnit: _enteredTimeUnit,
+          color: _selectedColor,
+          icon: _selectedIcon));
+
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -30,97 +46,98 @@ class _CreateEventPageState extends State<CreateEventPage> {
           IconButton(onPressed: _saveEvent, icon: const Icon(Icons.save))
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              //
-              // TITLE
-              //
-              TextFormField(
-                maxLength: 30,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(), label: Text('Title')),
-                onSaved: (newValue) {
-                  _enteredTitle = newValue!;
-                },
-              ),
-              //
-              // EVENT DATE
-              //
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: DateTimeFormField(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                //
+                // TITLE
+                //
+                TextFormField(
+                  maxLength: 30,
                   decoration: const InputDecoration(
-                    hintStyle: TextStyle(color: Colors.black45),
-                    errorStyle: TextStyle(color: Colors.redAccent),
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.event_note),
-                    labelText: 'Event Date',
-                  ),
-                  mode: DateTimeFieldPickerMode.date,
-                  autovalidateMode: AutovalidateMode.always,
-                  validator: (e) =>
-                      (e?.day ?? 0) == 1 ? 'Please not the first day' : null,
-                  onDateSelected: (DateTime value) {
-                    print(value);
+                      border: OutlineInputBorder(), label: Text('Title')),
+                  validator: (value) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        value.trim().length <= 1 ||
+                        value.trim().length > 30) {
+                      return 'Must be between 1 and 30 characters';
+                    }
+                    return null;
+                  },
+                  onSaved: (newValue) {
+                    _enteredTitle = newValue!;
                   },
                 ),
-              ),
-              //
-              // EVENT TIME
-              //
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Container(
+                //
+                // EVENT DATE
+                //
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: DateTimeFormField(
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        suffixIcon: Icon(Icons.event_note),
+                        labelText: 'Event Date'),
+                    mode: DateTimeFieldPickerMode.date,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (e) =>
+                        (e == null) ? 'Please enter a valid date' : null,
+                    onDateSelected: (DateTime value) {
+                      _enteredEventDate = value;
+                    },
+                  ),
+                ),
+                //
+                // EVENT TIME
+                //
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Expanded(
                         child: DateTimeFormField(
-                          enabled: isAllDay ? false : true,
+                          enabled: _isAllDay ? false : true,
                           decoration: const InputDecoration(
-                            hintStyle: TextStyle(color: Colors.black45),
-                            errorStyle: TextStyle(color: Colors.redAccent),
                             border: OutlineInputBorder(),
                             suffixIcon: Icon(Icons.more_time),
                             labelText: 'Event Time',
                           ),
                           mode: DateTimeFieldPickerMode.time,
-                          autovalidateMode: AutovalidateMode.always,
-                          validator: (e) => (e?.day ?? 0) == 1
-                              ? 'Please not the first day'
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (e) => (e == null && _isAllDay == false)
+                              ? 'Please enter a valid time'
                               : null,
                           onDateSelected: (DateTime value) {
-                            print(value);
+                            _enteredEventTime = value;
                           },
                         ),
                       ),
                       const SizedBox(width: 16),
                       const Text('All Day'),
                       Checkbox(
-                        value: isAllDay,
+                        value: _isAllDay,
                         onChanged: (value) {
                           setState(() {
-                            isAllDay = value!;
+                            _isAllDay = value!;
                           });
                         },
                       ),
                     ],
                   ),
                 ),
-              ),
-              //
-              // COUNTER UNIT
-              //
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: DropdownButtonFormField(
+                //
+                // COUNTER UNIT
+                //
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: DropdownButtonFormField(
                     decoration: const InputDecoration(
-                      hintStyle: TextStyle(color: Colors.black45),
-                      errorStyle: TextStyle(color: Colors.redAccent),
                       border: OutlineInputBorder(),
                       labelText: 'Counter Unit',
                     ),
@@ -128,136 +145,144 @@ class _CreateEventPageState extends State<CreateEventPage> {
                       return DropdownMenuItem(
                           value: counterUnit, child: Text(counterUnit.name));
                     }).toList(),
-                    onChanged: (onChanged) {}),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    //
-                    // ICON SELECTOR
-                    //
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Icon'),
-                          InkWell(
-                            onTap: () {
-                              print('color selected');
-                            },
-                            splashColor: Theme.of(context).highlightColor,
-                            borderRadius: BorderRadius.circular(5),
-                            child: Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                  border: Border.all(width: 1),
-                                  borderRadius: BorderRadius.circular(5)),
-                              width: double.infinity,
-                              child: const Icon(Icons.colorize_outlined),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    //
-                    // COLOR SELECTOR
-                    //
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Color'),
-                          InkWell(
-                            onTap: () {
-                              print('color selected');
-                            },
-                            splashColor: Theme.of(context).primaryColorDark,
-                            borderRadius: BorderRadius.circular(5),
-                            child: Container(
-                              height: 48,
-                              decoration: BoxDecoration(
-                                  color: _selectedColor,
-                                  borderRadius: BorderRadius.circular(5)),
-                              width: double.infinity,
-                              child: const Text('hello'),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              //
-              // START DATE
-              //
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: DateTimeFormField(
-                  decoration: const InputDecoration(
-                    hintStyle: TextStyle(color: Colors.black45),
-                    errorStyle: TextStyle(color: Colors.redAccent),
-                    border: OutlineInputBorder(),
-                    suffixIcon: Icon(Icons.event_note),
-                    labelText: 'Start Date',
+                    validator: (e) =>
+                        (e == null) ? 'Please enter a valid date' : null,
+                    onChanged: (value) {
+                      setState(() {
+                        _enteredTimeUnit = value!;
+                      });
+                    },
                   ),
-                  mode: DateTimeFieldPickerMode.date,
-                  autovalidateMode: AutovalidateMode.always,
-                  validator: (e) =>
-                      (e?.day ?? 0) == 1 ? 'Please not the first day' : null,
-                  onDateSelected: (DateTime value) {
-                    print(value);
-                  },
                 ),
-              ),
-              //
-              // START TIME
-              //
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Container(
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      //
+                      // ICON SELECTOR
+                      //
                       Expanded(
-                        child: DateTimeFormField(
-                          enabled: isAllDay ? false : true,
-                          decoration: const InputDecoration(
-                            hintStyle: TextStyle(color: Colors.black45),
-                            errorStyle: TextStyle(color: Colors.redAccent),
-                            border: OutlineInputBorder(),
-                            suffixIcon: Icon(Icons.more_time),
-                            labelText: 'Start Time',
-                          ),
-                          mode: DateTimeFieldPickerMode.time,
-                          autovalidateMode: AutovalidateMode.always,
-                          validator: (e) => (e?.day ?? 0) == 1
-                              ? 'Please not the first day'
-                              : null,
-                          onDateSelected: (DateTime value) {
-                            print(value);
-                          },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Icon'),
+                            InkWell(
+                              onTap: () {
+                                print('color selected');
+                              },
+                              splashColor: Theme.of(context).highlightColor,
+                              borderRadius: BorderRadius.circular(5),
+                              child: Container(
+                                height: 48,
+                                decoration: BoxDecoration(
+                                    border: Border.all(width: 1),
+                                    borderRadius: BorderRadius.circular(5)),
+                                width: double.infinity,
+                                child: const Icon(Icons.colorize_outlined),
+                              ),
+                            )
+                          ],
                         ),
                       ),
                       const SizedBox(width: 16),
-                      const Text('All Day'),
-                      Checkbox(
-                        value: isAllDay,
-                        onChanged: (value) {
-                          setState(() {
-                            isAllDay = value!;
-                          });
-                        },
+                      //
+                      // COLOR SELECTOR
+                      //
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Color'),
+                            InkWell(
+                              onTap: () {
+                                print('color selected');
+                              },
+                              splashColor: Theme.of(context).primaryColorDark,
+                              borderRadius: BorderRadius.circular(5),
+                              child: Container(
+                                height: 48,
+                                decoration: BoxDecoration(
+                                    color: _selectedColor,
+                                    borderRadius: BorderRadius.circular(5)),
+                                width: double.infinity,
+                                child: const Text('hello'),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+                //
+                // START DATE
+                //
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 16.0),
+                //   child: DateTimeFormField(
+                //     decoration: const InputDecoration(
+                //       hintStyle: TextStyle(color: Colors.black45),
+                //       errorStyle: TextStyle(color: Colors.redAccent),
+                //       border: OutlineInputBorder(),
+                //       suffixIcon: Icon(Icons.event_note),
+                //       labelText: 'Start Date',
+                //     ),
+                //     mode: DateTimeFieldPickerMode.date,
+                //     autovalidateMode: AutovalidateMode.always,
+                //     validator: (e) =>
+                //         (e?.day ?? 0) == 1 ? 'Please not the first day' : null,
+                //     onDateSelected: (DateTime value) {
+                //       print(value);
+                //     },
+                //   ),
+                // ),
+                //
+                // START TIME
+                //
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 16),
+                //   child: Container(
+                //     child: Row(
+                //       mainAxisAlignment: MainAxisAlignment.end,
+                //       children: [
+                //         Expanded(
+                //           child: DateTimeFormField(
+                //             enabled: isAllDay ? false : true,
+                //             decoration: const InputDecoration(
+                //               hintStyle: TextStyle(color: Colors.black45),
+                //               errorStyle: TextStyle(color: Colors.redAccent),
+                //               border: OutlineInputBorder(),
+                //               suffixIcon: Icon(Icons.more_time),
+                //               labelText: 'Start Time',
+                //             ),
+                //             mode: DateTimeFieldPickerMode.time,
+                //             autovalidateMode: AutovalidateMode.always,
+                //             validator: (e) => (e?.day ?? 0) == 1
+                //                 ? 'Please not the first day'
+                //                 : null,
+                //             onDateSelected: (DateTime value) {
+                //               print(value);
+                //             },
+                //           ),
+                //         ),
+                //         const SizedBox(width: 16),
+                //         const Text('All Day'),
+                //         Checkbox(
+                //           value: isAllDay,
+                //           onChanged: (value) {
+                //             setState(() {
+                //               isAllDay = value!;
+                //             });
+                //           },
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+              ],
+            ),
           ),
         ),
       ),
