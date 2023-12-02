@@ -12,10 +12,10 @@ class Event {
     required this.eventDate,
     required this.isAllDay,
     required this.hmsTime,
-    this.timeUnit = CounterUnits.summary,
+    required this.timeUnit,
     this.isCountdown = false,
     this.isDone = false,
-    this.color = Colors.black,
+    required this.color,
     required this.icon,
     // this.startDate = DateTime.now(),
   }) : id = id ?? uuid.v4();
