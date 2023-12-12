@@ -13,21 +13,24 @@ class CreateEventPage extends ConsumerStatefulWidget {
 
 class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   final _formKey = GlobalKey<FormState>();
-  var _enteredTitle = '';
-  var _enteredEventDate = DateTime.now();
-  var _enteredTimeUnit = CounterUnits.summary;
-  var _selectedIcon = const Icon(Icons.star);
-  var _selectedColor = Colors.black;
+  var _enteredTitle;
+  var _enteredEventDate;
+  var _enteredTimeUnit;
+  var _selectedIcon = IconData(Icons.abc.codePoint);
+  Color _selectedColor = Colors.black;
 
   void _saveEvent() {
     _formKey.currentState!.save();
     if (_formKey.currentState!.validate()) {
-      ref.read(userEventsProvider.notifier).addEvent(Event(
-          title: _enteredTitle,
-          eventDate: _enteredEventDate,
-          timeUnit: _enteredTimeUnit,
-          color: _selectedColor,
-          icon: _selectedIcon));
+      ref.read(userEventsProvider.notifier).addEvent(
+            Event(
+              title: _enteredTitle,
+              eventDate: _enteredEventDate.toString(),
+              timeUnit: _enteredTimeUnit.toString(),
+              color: _selectedColor.toString(),
+              icon: _selectedIcon.toString(),
+            ),
+          );
 
       Navigator.pop(context);
     }
@@ -126,9 +129,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           children: [
                             const Text('Icon'),
                             InkWell(
-                              onTap: () {
-                                print('color selected');
-                              },
+                              onTap: () {},
                               splashColor: Theme.of(context).highlightColor,
                               borderRadius: BorderRadius.circular(5),
                               child: Container(
@@ -153,9 +154,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           children: [
                             const Text('Color'),
                             InkWell(
-                              onTap: () {
-                                print('color selected');
-                              },
+                              onTap: () {},
                               splashColor: Theme.of(context).primaryColorDark,
                               borderRadius: BorderRadius.circular(5),
                               child: Container(
