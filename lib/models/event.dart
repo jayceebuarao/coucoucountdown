@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 const uuid = Uuid();
@@ -11,8 +10,8 @@ class Event {
     required this.title,
     required this.eventDate,
     required this.timeUnit,
-    this.isCountdown = false,
-    this.isDone = false,
+    this.isCountdown = 0,
+    this.isDone = 0,
     required this.color,
     required this.icon,
     // this.startDate = DateTime.now(),
@@ -20,11 +19,34 @@ class Event {
 
   final String id;
   final String title;
-  final DateTime eventDate;
-  final CounterUnits timeUnit;
-  final bool isCountdown;
-  final bool isDone;
-  final Color color;
-  final Icon icon;
+  final String eventDate;
+  final String timeUnit;
+  final int isCountdown;
+  final int isDone;
+  final String color;
+  final String icon;
   // final DateTime startDate;
+
+  factory Event.fromMap(Map<String, dynamic> json) => Event(
+      id: json['id'],
+      title: json['title'],
+      eventDate: json['eventDate'],
+      timeUnit: json['timeUnit'],
+      isCountdown: json['isCountdown'],
+      isDone: json['isDone'],
+      color: json['color'],
+      icon: json['icon']);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'eventDate': eventDate,
+      'timeUnit': timeUnit,
+      'isCountdown': isCountdown,
+      'isDone': isDone,
+      'color': color,
+      'icon': icon,
+    };
+  }
 }
