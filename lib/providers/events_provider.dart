@@ -1,5 +1,4 @@
 import 'package:coucoucountdown/models/event.dart';
-import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 import 'package:sqflite/sqlite_api.dart';
 import 'package:path/path.dart' as path;
@@ -9,10 +8,10 @@ Future<Database> _getDatabase() async {
   final dbPath = await sql.getDatabasesPath();
   final db = await sql.openDatabase(
     path.join(dbPath, 'events.db'),
-    version: 3,
+    version: 5,
     onCreate: (db, version) {
       return db.execute(
-          'CREATE TABLE user_events(id TEXT PRIMARY KEY, title TEXT, eventDate TEXT, timeUnit TEXT, isCountdown INTEGER, isDone INTEGER, color BLOB, icon BLOB)');
+          'CREATE TABLE user_events(id TEXT PRIMARY KEY, title TEXT, eventDate BLOB, timeUnit BLOB, isCountdown BLOB, isDone BLOB, color BLOB, icon BLOB)');
     },
   );
 
@@ -24,41 +23,18 @@ class UserEventsNotifier extends StateNotifier<List<Event>> {
 
   Future<void> loadEvents() async {
     final db = await _getDatabase();
+    // await db.execute('DELETE FROM user_events;');
     final data = await db.query('user_events');
-    final events = data
-        .map(
-          (row) => Event(
-              title: row['title'] as String,
-              eventDate: row['eventDate'] as DateTime,
-              timeUnit: row['timeUnit'] as CounterUnits,
-              isCountdown: row['isCountdown'] as bool,
-              isDone: row['isDone'] as bool,
-              color: row['color'] as Color,
-              icon: row['icon'] as Icon),
-        )
-        .toList();
-
+    final events = data.map((e) => Event.fromMap(e)).toList();
     state = events;
   }
 
+  //add data to db
   void addEvent(Event newEvent) async {
     final db = await _getDatabase();
-    db.insert(
-      'user_events',
-      {
-        'id': newEvent.id,
-        'title': newEvent.title,
-        'eventDate': newEvent.eventDate.toString(),
-        'timeUnit': newEvent.timeUnit,
-        'isCountdown': newEvent.isCountdown,
-        'isDone': newEvent.isDone,
-        'color': newEvent.color,
-        'icon': newEvent.icon,
-      },
-    );
+    db.insert('user_events', newEvent.toMap());
 
     state = [newEvent, ...state];
-    print(state.toList());
   }
 }
 
