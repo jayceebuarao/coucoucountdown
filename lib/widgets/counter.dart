@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 
 class CounterWidget extends StatefulWidget {
   const CounterWidget(
-      {super.key, required this.eventDate, required this.timeUnit});
+      {super.key,
+      required this.eventDate,
+      required this.timeUnit,
+      required this.eventTitle});
 
   final String eventDate;
   final String timeUnit;
+  final String eventTitle;
 
   @override
   State<CounterWidget> createState() => _CounterWidgetState();
@@ -14,15 +18,18 @@ class CounterWidget extends StatefulWidget {
 
 class _CounterWidgetState extends State<CounterWidget> {
   DateTime _dateTime = DateTime.now();
-  // ignore: unused_field
   Timer? _timer;
-  String _counter = '';
 
   @override
   void initState() {
     super.initState();
-    // _stream = getTimeNow();
     _updateTime();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _timer!.cancel();
   }
 
   String _calculateTimeBetween() {
@@ -33,11 +40,11 @@ class _CounterWidgetState extends State<CounterWidget> {
       case 'CounterUnits.summary':
         return '$difference';
       case 'CounterUnits.years':
-        return '${difference * 0.000114155} years left';
+        return '${(difference.inHours * 0.000114155).toStringAsFixed(2)} years left';
       case 'CounterUnits.months':
-        return '${difference * 0.00136986} months left';
+        return '${(difference.inHours * 0.00136986).toStringAsFixed(2)} months left';
       case 'CounterUnits.weeks':
-        return '${difference * 0.0059523743802857142} weeks left';
+        return '${(difference.inHours * 0.0059523743802857142).toStringAsFixed(2)} weeks left';
       case 'CounterUnits.days':
         return '${difference.inDays} days left';
       case 'CounterUnits.hours':
@@ -51,12 +58,12 @@ class _CounterWidgetState extends State<CounterWidget> {
 
   void _updateTime() {
     setState(() {
-      _counter = _calculateTimeBetween();
+      _calculateTimeBetween();
       _dateTime = DateTime.now();
       // Update once per minute. If you want to update every second, use the
       // following code.
       _timer = Timer(
-        Duration(minutes: 1) -
+        const Duration(minutes: 1) -
             Duration(seconds: _dateTime.second) -
             Duration(milliseconds: _dateTime.millisecond),
         _updateTime,
@@ -67,8 +74,8 @@ class _CounterWidgetState extends State<CounterWidget> {
   @override
   Widget build(BuildContext context) {
     return Text(
-      _counter,
-      style: const TextStyle(fontSize: 36, overflow: TextOverflow.clip),
+      _calculateTimeBetween(),
+      style: const TextStyle(fontSize: 28, overflow: TextOverflow.clip),
     );
   }
 }

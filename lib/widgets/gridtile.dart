@@ -26,10 +26,10 @@ class EventGridTile extends StatelessWidget {
           children: [
             Text(event.title),
             SizedBox.square(
-              dimension: 80,
               child: Text(event.icon),
             ),
             CounterWidget(
+              eventTitle: event.title,
               eventDate: event.eventDate,
               timeUnit: event.timeUnit,
             ),

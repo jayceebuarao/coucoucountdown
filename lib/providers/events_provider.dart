@@ -24,7 +24,7 @@ class UserEventsNotifier extends StateNotifier<List<Event>> {
   Future<void> loadEvents() async {
     final db = await _getDatabase();
     // await db.execute('DELETE FROM user_events;');
-    final data = await db.query('user_events');
+    final data = await db.query('user_events ORDER BY eventDate ASC');
     final events = data.map((e) => Event.fromMap(e)).toList();
     state = events;
   }
@@ -33,8 +33,8 @@ class UserEventsNotifier extends StateNotifier<List<Event>> {
   void addEvent(Event newEvent) async {
     final db = await _getDatabase();
     db.insert('user_events', newEvent.toMap());
-
-    state = [newEvent, ...state];
+    loadEvents();
+    // state = [newEvent, ...state];
   }
 }
 

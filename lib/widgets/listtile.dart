@@ -31,8 +31,8 @@ class EventListTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(event.title),
-
                 CounterWidget(
+                  eventTitle: event.title,
                   eventDate: event.eventDate,
                   timeUnit: event.timeUnit,
                 ),
@@ -45,7 +45,7 @@ class EventListTile extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           SizedBox.square(
             dimension: 80,
             child: Text(event.icon),
