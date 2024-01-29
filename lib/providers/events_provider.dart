@@ -36,6 +36,29 @@ class UserEventsNotifier extends StateNotifier<List<Event>> {
     loadEvents();
     // state = [newEvent, ...state];
   }
+
+  void deleteEvent(String eventID) async {
+    final db = await _getDatabase();
+    db.execute("DELETE FROM user_events WHERE id = '$eventID'");
+    loadEvents();
+  }
+
+  void editEvent(Event event) async {
+    final db = await _getDatabase();
+    db.update(
+        'user_events',
+        {
+          'title': event.title,
+          'eventDate': event.eventDate,
+          'timeUnit': event.timeUnit,
+          'color': event.color,
+          'icon': event.icon,
+        },
+        where: "id = '${event.id}'");
+    // db.execute(
+    //     "UPDATE user_events SET title = '${event.title}', eventDate = '${event.eventDate}', timeUnit = '${event.timeUnit}', color = '${event.color}', icon = '${event.icon}' WHERE id = '${event.id}'");
+    loadEvents();
+  }
 }
 
 final userEventsProvider =

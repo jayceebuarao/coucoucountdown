@@ -7,7 +7,10 @@ import 'package:date_field/date_field.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CreateEventPage extends ConsumerStatefulWidget {
-  const CreateEventPage({super.key});
+  const CreateEventPage({super.key, this.isEditScreen = false, this.event});
+
+  final bool isEditScreen;
+  final Event? event;
 
   @override
   ConsumerState<CreateEventPage> createState() => _CreateEventPageState();
@@ -24,6 +27,23 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   void _saveEvent() {
     _formKey.currentState!.save();
     if (_formKey.currentState!.validate()) {
+      Navigator.pop(context);
+      if (widget.isEditScreen) {
+        print('EVENT DATE $_enteredEventDate');
+
+        ref.read(userEventsProvider.notifier).editEvent(
+              Event(
+                id: widget.event!.id,
+                title: _enteredTitle,
+                eventDate: _enteredEventDate.toString(),
+                timeUnit: _enteredTimeUnit.toString(),
+                color: _selectedColor.toString(),
+                icon: _selectedIcon.toString(),
+              ),
+            );
+        return;
+      }
+
       ref.read(userEventsProvider.notifier).addEvent(
             Event(
               title: _enteredTitle,
@@ -33,16 +53,20 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
               icon: _selectedIcon.toString(),
             ),
           );
-
-      Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.isEditScreen) {
+      print('CHEEEEEEEEEEEEEEEEEEECK');
+      _enteredTitle = widget.event!.title;
+      _enteredEventDate = DateTime.parse(widget.event!.eventDate);
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Event'),
+        title: widget.isEditScreen ? Text('Edit Event') : Text('Create Event'),
         actions: [
           IconButton(onPressed: _saveEvent, icon: const Icon(Icons.save))
         ],
@@ -58,6 +82,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                 // TITLE
                 //
                 TextFormField(
+                  initialValue: _enteredTitle,
                   maxLength: 30,
                   decoration: const InputDecoration(
                       border: OutlineInputBorder(), label: Text('Title')),
@@ -86,6 +111,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         labelText: 'Event Date and Time'),
                     mode: DateTimeFieldPickerMode.dateAndTime,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
+                    initialValue: _enteredEventDate,
                     validator: (e) =>
                         (e == null) ? 'Please enter a valid date' : null,
                     onDateSelected: (DateTime value) {

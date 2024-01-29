@@ -1,14 +1,17 @@
 import 'package:coucoucountdown/models/event.dart';
+import 'package:coucoucountdown/providers/events_provider.dart';
+import 'package:coucoucountdown/screens/createeventpage.dart';
 import 'package:coucoucountdown/widgets/counter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class EventDetailPage extends StatelessWidget {
+class EventDetailPage extends ConsumerWidget {
   const EventDetailPage({super.key, required this.event});
 
   final Event event;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -51,17 +54,33 @@ class EventDetailPage extends StatelessWidget {
               alignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton.icon(
-                    onPressed: () {},
-                    icon: Icon(Icons.delete_outline),
-                    label: Text('delete')),
+                    onPressed: () {
+                      ref
+                          .read(userEventsProvider.notifier)
+                          .deleteEvent(event.id);
+
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('${event.title} deleted')));
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.delete_outline),
+                    label: const Text('delete')),
                 TextButton.icon(
                     onPressed: () {},
-                    icon: Icon(Icons.archive_outlined),
-                    label: Text('archive')),
+                    icon: const Icon(Icons.archive_outlined),
+                    label: const Text('archive')),
                 TextButton.icon(
-                    onPressed: () {},
-                    icon: Icon(Icons.edit_outlined),
-                    label: Text('edit'))
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => CreateEventPage(
+                          isEditScreen: true,
+                          event: event,
+                        ),
+                      ));
+                    },
+                    icon: const Icon(Icons.edit_outlined),
+                    label: const Text('edit'))
               ],
             )
           ],
