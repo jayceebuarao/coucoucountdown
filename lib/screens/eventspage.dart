@@ -1,5 +1,7 @@
+import 'package:coucoucountdown/models/event.dart';
 import 'package:coucoucountdown/providers/events_provider.dart';
 import 'package:coucoucountdown/screens/createeventpage.dart';
+import 'package:coucoucountdown/screens/eventdetailpage.dart';
 import 'package:coucoucountdown/widgets/gridtile.dart';
 import 'package:coucoucountdown/widgets/listtile.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,14 @@ class _EventsPageState extends ConsumerState<EventsPage> {
   void initState() {
     super.initState();
     _eventsFuture = ref.read(userEventsProvider.notifier).loadEvents();
+  }
+
+  void _onTapEvent(BuildContext context, Event event) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => EventDetailPage(
+        event: event,
+      ),
+    ));
   }
 
   @override
@@ -67,7 +77,10 @@ class _EventsPageState extends ConsumerState<EventsPage> {
                           const SizedBox(height: 16),
                       itemCount: userEvents.length,
                       itemBuilder: (context, index) {
-                        return EventListTile(event: userEvents[index]);
+                        return EventListTile(
+                          event: userEvents[index],
+                          onTapEvent: _onTapEvent,
+                        );
                       },
                     )
                   : GridView.builder(
@@ -80,7 +93,10 @@ class _EventsPageState extends ConsumerState<EventsPage> {
                               mainAxisSpacing: 16),
                       itemCount: userEvents.length,
                       itemBuilder: (context, index) {
-                        return EventGridTile(event: userEvents[index]);
+                        return EventGridTile(
+                          event: userEvents[index],
+                          onTapEvent: _onTapEvent,
+                        );
                       },
                     );
             }

@@ -6,11 +6,14 @@ class CounterWidget extends StatefulWidget {
       {super.key,
       required this.eventDate,
       required this.timeUnit,
-      required this.eventTitle});
+      required this.eventTitle,
+      this.textStyle =
+          const TextStyle(fontSize: 28, overflow: TextOverflow.clip)});
 
   final String eventDate;
   final String timeUnit;
   final String eventTitle;
+  final TextStyle textStyle;
 
   @override
   State<CounterWidget> createState() => _CounterWidgetState();
@@ -75,7 +78,8 @@ class _CounterWidgetState extends State<CounterWidget> {
   Widget build(BuildContext context) {
     return Text(
       _calculateTimeBetween(),
-      style: const TextStyle(fontSize: 28, overflow: TextOverflow.clip),
+      style: widget.textStyle,
+      textAlign: TextAlign.center,
     );
   }
 }

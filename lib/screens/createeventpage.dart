@@ -34,7 +34,6 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
             ),
           );
 
-      print('Go Back to Events Page');
       Navigator.pop(context);
     }
   }
