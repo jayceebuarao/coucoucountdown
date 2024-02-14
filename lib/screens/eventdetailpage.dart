@@ -20,7 +20,6 @@ class EventDetailPage extends ConsumerWidget {
       ),
       body: Container(
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
           gradient: LinearGradient(
             colors: [
               Colors.yellow.shade700,
@@ -33,7 +32,7 @@ class EventDetailPage extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            SizedBox(height: 1),
+            const SizedBox(height: 1),
             Text(
               event.title,
               style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
