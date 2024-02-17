@@ -264,6 +264,16 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     ],
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Column(
+                    children: [
+                      ElevatedButton(
+                          onPressed: () {}, child: const Text('Save')),
+                      TextButton(onPressed: () {}, child: const Text('Cancel')),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
