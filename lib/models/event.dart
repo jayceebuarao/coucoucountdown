@@ -23,7 +23,8 @@ class Event {
   final String timeUnit;
   final int isCountdown;
   final int isDone;
-  final String color;
+  // ignore: prefer_typing_uninitialized_variables
+  final color;
   final String icon;
   // final DateTime startDate;
 

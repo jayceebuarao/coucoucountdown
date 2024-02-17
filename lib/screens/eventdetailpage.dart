@@ -22,8 +22,8 @@ class EventDetailPage extends ConsumerWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.yellow.shade700,
-              Colors.yellow.shade700.withOpacity(0),
+              Color(event.color),
+              Color(event.color).withOpacity(0),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -48,7 +48,7 @@ class EventDetailPage extends ConsumerWidget {
                     const TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
               ),
             ),
-            Text(event.color),
+            Text(event.color.toString()),
             OverflowBar(
               alignment: MainAxisAlignment.spaceEvenly,
               children: [

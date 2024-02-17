@@ -8,10 +8,10 @@ Future<Database> _getDatabase() async {
   final dbPath = await sql.getDatabasesPath();
   final db = await sql.openDatabase(
     path.join(dbPath, 'events.db'),
-    version: 5,
+    version: 10,
     onCreate: (db, version) {
       return db.execute(
-          'CREATE TABLE user_events(id TEXT PRIMARY KEY, title TEXT, eventDate BLOB, timeUnit BLOB, isCountdown BLOB, isDone BLOB, color BLOB, icon BLOB)');
+          'CREATE TABLE user_events(id TEXT PRIMARY KEY, title TEXT, eventDate BLOB, timeUnit BLOB, isCountdown BLOB, isDone BLOB, color INTEGER, icon BLOB)');
     },
   );
 
@@ -26,6 +26,7 @@ class UserEventsNotifier extends StateNotifier<List<Event>> {
     // await db.execute('DELETE FROM user_events;');
     final data = await db.query('user_events ORDER BY eventDate ASC');
     final events = data.map((e) => Event.fromMap(e)).toList();
+    print(data.map((e) => Event.fromMap(e)).toList());
     state = events;
   }
 
@@ -34,6 +35,7 @@ class UserEventsNotifier extends StateNotifier<List<Event>> {
     final db = await _getDatabase();
     db.insert('user_events', newEvent.toMap());
     loadEvents();
+    print(' EVENT????????? ${newEvent.toMap()}');
     // state = [newEvent, ...state];
   }
 

@@ -26,7 +26,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   var _enteredEventDate;
   var _enteredTimeUnit;
   var _enteredIcon = '⏳';
-  var _enteredColor = Colors.black.value;
+  int _enteredColor = Colors.black.value;
   var _userEventDate;
 
 // Color for the picker shown in Card on the screen.
@@ -39,10 +39,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   @override
   void initState() {
     super.initState();
-
-    screenPickerColor = Colors.blue; // Material blue.
-    dialogPickerColor = Colors.red; // Material red.
-    dialogSelectColor = const Color(0xFFA239CA); // A purple color.
+    screenPickerColor = Colors.blue; // Material blue.or.
   }
 
   @override
@@ -62,22 +59,29 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                 title: _enteredTitle,
                 eventDate: _enteredEventDate.toString(),
                 timeUnit: _enteredTimeUnit.toString(),
-                color: _enteredColor.toString(),
-                icon: _enteredIcon.toString(),
+                color: _enteredColor,
+                icon: _enteredIcon,
               ),
             );
         return;
       }
 
-      ref.read(userEventsProvider.notifier).addEvent(
-            Event(
-              title: _enteredTitle,
-              eventDate: _enteredEventDate.toString(),
-              timeUnit: _enteredTimeUnit.toString(),
-              color: _enteredColor.toString(),
-              icon: _enteredIcon.toString(),
-            ),
-          );
+      try {
+        ref.read(userEventsProvider.notifier).addEvent(
+              Event(
+                title: _enteredTitle,
+                eventDate: _enteredEventDate.toString(),
+                timeUnit: _enteredTimeUnit.toString(),
+                color: _enteredColor,
+                icon: _enteredIcon,
+              ),
+            );
+
+        print(
+            'title: $_enteredTitle, eventDate: $_enteredEventDate, timeUnit: $_enteredTimeUnit, color: $_enteredColor ${_enteredColor.runtimeType}, icon: $_enteredIcon ${_enteredIcon.runtimeType}');
+      } catch (e) {
+        print('UNSUCCESSFUL!!!!! $e');
+      }
     }
   }
 
@@ -220,6 +224,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                             if (!emojiRegex.hasMatch(value.toString())) {
                               return 'Enter Valid Emoji';
                             }
+                            return null;
                           },
                           onChanged: (value) {
                             if (emojiRegex.hasMatch(value.toString())) {
@@ -229,10 +234,8 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                             }
                           },
                           onSaved: (newValue) {
-                            _enteredIcon = emojiRegex
-                                .firstMatch(newValue.toString()) as String;
+                            _enteredIcon = emojiRegex.stringMatch(newValue!)!;
                           },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
                         ),
                       ),
                     ],
@@ -269,8 +272,10 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                   child: Column(
                     children: [
                       ElevatedButton(
-                          onPressed: () {}, child: const Text('Save')),
-                      TextButton(onPressed: () {}, child: const Text('Cancel')),
+                          onPressed: _saveEvent, child: const Text('Save')),
+                      TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Cancel')),
                     ],
                   ),
                 ),
