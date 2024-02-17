@@ -12,7 +12,6 @@ class EventGridTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        print('widget taped ${event.title}');
         onTapEvent(context, event);
       },
       borderRadius: const BorderRadius.all(Radius.circular(12)),

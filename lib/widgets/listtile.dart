@@ -13,7 +13,6 @@ class EventListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        print('widget taped ${event.title}');
         onTapEvent(context, event);
       },
       borderRadius: const BorderRadius.all(Radius.circular(12)),
@@ -56,7 +55,11 @@ class EventListTile extends StatelessWidget {
             const SizedBox(width: 16),
             SizedBox.square(
               dimension: 80,
-              child: Text(event.icon),
+              child: Text(
+                event.icon,
+                style: const TextStyle(fontSize: 48),
+                textAlign: TextAlign.center,
+              ),
             )
           ],
         ),
